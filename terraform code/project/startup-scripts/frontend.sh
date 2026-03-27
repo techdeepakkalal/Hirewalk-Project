@@ -10,16 +10,16 @@ yum install -y git nginx
 
 echo "=== Packages installed ==="
 
-# ── Web directory banao ────────────────────────────────────
+# ── Create web directory ───────────────────────────────────
 mkdir -p /var/www/hirewalk
 cd /var/www/hirewalk
 
-# ── GitHub se code clone karo ──────────────────────────────
+# ── Clone code from GitHub ─────────────────────────────────
 git clone https://github.com/techdeepakkalal/hackathon-projecct.git .
 echo "=== Code cloned ==="
 
-# ── Nginx config banao ─────────────────────────────────────
-# /api/* → Backend ALB pe proxy (Frontend EC2 → Backend ALB → Backend EC2)
+# ── Create Nginx config ────────────────────────────────────
+# /api/* → Proxy to Backend ALB (Frontend EC2 → Backend ALB → Backend EC2)
 cat > /etc/nginx/conf.d/hirewalk.conf << NGINXEOF
 server {
     listen 80;
@@ -33,7 +33,7 @@ server {
     add_header X-Content-Type-Options "nosniff" always;
     add_header X-XSS-Protection "1; mode=block" always;
 
-    # /api/* → Backend ALB pe forward
+    # Forward /api/* to Backend ALB
     location /api/ {
         proxy_pass http://${backend_alb_dns}/api/;
         proxy_http_version 1.1;
@@ -57,13 +57,13 @@ server {
 }
 NGINXEOF
 
-# ── Default nginx server block hataao ─────────────────────
+# ── Remove default nginx server block ─────────────────────
 sed -i '/^    server {/,/^    }/d' /etc/nginx/nginx.conf
 
-# ── Nginx config test ──────────────────────────────────────
+# ── Test Nginx config ──────────────────────────────────────
 nginx -t && echo "Nginx config OK"
 
-# ── Nginx enable aur start karo ────────────────────────────
+# ── Enable and start Nginx ─────────────────────────────────
 systemctl enable nginx
 systemctl start nginx
 

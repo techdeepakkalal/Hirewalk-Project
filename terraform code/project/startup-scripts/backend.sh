@@ -1,6 +1,6 @@
 #!/bin/bash
 # Production ready backend startup script
-# set -e NAHI hai — pip conflict pe script band nahi hogi
+# Note: set -e is intentionally omitted — script continues even if pip has conflicts
 exec > /var/log/backend-setup.log 2>&1
 
 echo "=== Backend setup start: $(date) ==="
@@ -11,16 +11,16 @@ yum install -y python3 python3-pip git mysql
 
 echo "=== Packages installed ==="
 
-# ── App directory banao ────────────────────────────────────
+# ── Create app directory ───────────────────────────────────
 mkdir -p /home/ec2-user/app
 cd /home/ec2-user/app
 
-# ── GitHub se code clone karo ──────────────────────────────
+# ── Clone code from GitHub ─────────────────────────────────
 git clone https://github.com/techdeepakkalal/hackathon-projecct.git .
 echo "=== Code cloned ==="
 
-# ── Python packages install karo ──────────────────────────
-# --ignore-installed: system rpm packages se conflict avoid
+# ── Install Python packages ────────────────────────────────
+# --ignore-installed: avoids conflicts with system rpm packages
 pip3 install \
   flask==2.2.5 \
   flask-cors==3.0.10 \
@@ -34,8 +34,8 @@ pip3 install \
 
 echo "=== Python packages installed ==="
 
-# ── .env file banao ────────────────────────────────────────
-cat > /home/ec2-user/app/backend/.env << EOF
+# ── Create .env file ───────────────────────────────────────
+cat > /home/ec2-user/app/backend/.env << ENV_EOF
 DB_HOST=${db_host}
 DB_PORT=3306
 DB_NAME=${db_name}
@@ -51,21 +51,21 @@ GROQ_MODEL=llama3-8b-8192
 DEBUG=False
 PORT=5000
 FRONTEND_URL=*
-EOF
+ENV_EOF
 
 echo "=== .env file created ==="
 
-# ── Database schema RDS pe initialize karo ─────────────────
-# Pehle RDS se connection check karo, phir schema run karo
+# ── Initialize database schema on RDS ──────────────────────
+# First verify connection to RDS, then run schema
 echo "=== Initializing database schema ==="
 mysql -h ${db_host} -P 3306 -u ${db_user} -p${db_password} < /home/ec2-user/app/database/schema.sql 2>&1 || echo "Schema already exists or error — continuing"
 
 echo "=== Database initialized ==="
 
-# ── Folder ka owner ec2-user karo ─────────────────────────
+# ── Set folder ownership to ec2-user ──────────────────────
 chown -R ec2-user:ec2-user /home/ec2-user/app
 
-# ── Systemd service banao ──────────────────────────────────
+# ── Create systemd service ─────────────────────────────────
 cat > /etc/systemd/system/hirewalk-backend.service << 'SVCEOF'
 [Unit]
 Description=HireWalk Backend API (Flask)
@@ -87,7 +87,7 @@ StandardError=journal
 WantedBy=multi-user.target
 SVCEOF
 
-# ── Service enable aur start karo ─────────────────────────
+# ── Enable and start service ───────────────────────────────
 systemctl daemon-reload
 systemctl enable hirewalk-backend
 systemctl start hirewalk-backend

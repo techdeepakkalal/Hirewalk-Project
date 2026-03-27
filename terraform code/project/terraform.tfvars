@@ -1,6 +1,6 @@
 # ================================================================
-#  terraform.tfvars — SIRF YEH FILE BADLNI HAI
-#  Koi bhi SECRET yahan NAHI hai — sab Parameter Store mein hai
+#  terraform.tfvars — ONLY THIS FILE NEEDS TO BE CHANGED
+#  No secrets are stored here — everything is in Parameter Store
 # ================================================================
 
 # ── Project ─────────────────────────────────────────────────
@@ -10,7 +10,7 @@ owner       = "HireWalk Team"
 aws_region  = "us-west-2"
 
 # ── Parameter Store base path ────────────────────────────────
-# AWS Console mein yeh path se parameters banao
+# Create parameters in AWS Console using this path
 ssm_path = "/hirewalk/prod"
 
 # ── Security ─────────────────────────────────────────────────

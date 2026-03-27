@@ -9,12 +9,12 @@ FOLDER STRUCTURE:
 
   terraform-aws-ha/
   │
-  ├── 1-pehle-chalao/          ← STEP 1: Sirf ek baar chalao
+  ├── 1-bootstrap/               ← STEP 1: Run only once
   │   ├── main.tf
   │   ├── variables.tf
-  │   └── terraform.tfvars     ← SIRF BUCKET NAAM BADLO
+  │   └── terraform.tfvars       ← ONLY change the bucket name here
   │
-  ├── 2-modules/               ← KABHI MAT CHHUO (reusable code)
+  ├── 2-modules/                 ← DO NOT TOUCH (reusable code)
   │   ├── vpc/
   │   ├── bastion/
   │   ├── security-groups/
@@ -24,47 +24,47 @@ FOLDER STRUCTURE:
   │   ├── cloudfront/
   │   └── route53/
   │
-  └── 3-mera-project/          ← STEP 2: Apna project yahan
-      ├── backend.tf            ← BUCKET NAAM DAALO
-      ├── terraform.tfvars      ← APNI VALUES DAALO (main file)
-      ├── main.tf               ← mat chhuo
-      ├── variables.tf          ← mat chhuo
-      ├── outputs.tf            ← mat chhuo
-      ├── versions.tf           ← mat chhuo
+  └── 3-project/                 ← STEP 2: Your project goes here
+      ├── backend.tf              ← Enter bucket name here
+      ├── terraform.tfvars        ← Enter your values here (main file)
+      ├── main.tf                 ← do not touch
+      ├── variables.tf            ← do not touch
+      ├── outputs.tf              ← do not touch
+      ├── versions.tf             ← do not touch
       └── startup-scripts/
-          ├── frontend.sh       ← APNA APP CODE DAALO
-          └── backend.sh        ← APNA APP CODE DAALO
+          ├── frontend.sh         ← Add your app code here
+          └── backend.sh          ← Add your app code here
 
 
 ==============================================================
-  DEPLOY KARNA HAI? SIRF YEH 3 STEPS:
+  READY TO DEPLOY? JUST 3 STEPS:
 ==============================================================
 
-STEP 1 — Pehle ek baar karo (S3 bucket banao):
-  cd 1-pehle-chalao/
-  terraform.tfvars mein bucket naam daalo
+STEP 1 — Run once (create S3 bucket for Terraform state):
+  cd 1-bootstrap/
+  Enter bucket name in terraform.tfvars
   terraform init
   terraform apply
 
-STEP 2 — Project deploy karo:
-  3-mera-project/backend.tf mein bucket naam daalo
-  3-mera-project/terraform.tfvars mein apni values daalo
-  Secrets terminal mein export karo (file mein mat likho!)
+STEP 2 — Configure your project:
+  Enter bucket name in 3-project/backend.tf
+  Enter your values in 3-project/terraform.tfvars
+  Export secrets in terminal (do NOT write them in files!)
 
-STEP 3 — Run karo:
-  cd 3-mera-project/
+STEP 3 — Deploy:
+  cd 3-project/
   terraform init
   terraform plan
   terraform apply
 
 
 ==============================================================
-  NAYE PROJECT MEIN REUSE KARNA HAI?
+  WANT TO REUSE FOR A NEW PROJECT?
 ==============================================================
 
-  1. Poora yeh folder copy karo naye project mein
-  2. Sirf 3-mera-project/terraform.tfvars mein values badlo
-  3. backend.tf mein naya bucket naam aur key path daalo
+  1. Copy this entire folder into your new project
+  2. Only change values in 3-project/terraform.tfvars
+  3. Enter new bucket name and key path in backend.tf
   4. Done!
 
 ==============================================================

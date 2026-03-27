@@ -1,21 +1,21 @@
 #!/bin/bash
 # ================================================================
-# Database Schema Initialize karo
-# Bastion host se yeh script chalao
+# Initialize Database Schema
+# Run this script from the Bastion host
 #
 # Usage:
 #   chmod +x init-database.sh
 #   ./init-database.sh
 # ================================================================
 
-RDS_HOST="YAHAN_RDS_ENDPOINT_DAALO"    # terraform output rds_address
+RDS_HOST="ENTER_RDS_ENDPOINT_HERE"    # Get from: terraform output rds_address
 DB_USER="admin"
 DB_NAME="walkin_platform"
 
-echo "RDS password daalo:"
+echo "Enter RDS password:"
 read -s DB_PASSWORD
 
-echo "Database schema initialize ho rahi hai..."
+echo "Initializing database schema..."
 
 mysql -h $RDS_HOST -u $DB_USER -p$DB_PASSWORD << 'SQL'
 CREATE DATABASE IF NOT EXISTS walkin_platform;
@@ -88,4 +88,4 @@ CREATE TABLE IF NOT EXISTS otp_store (
 SHOW TABLES;
 SQL
 
-echo "Database schema complete!"
+echo "Database schema initialized successfully!"

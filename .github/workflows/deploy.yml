@@ -1,0 +1,79 @@
+name: Deploy HireWalk
+
+# ── Kab chalega ──────────────────────────────────────────────
+on:
+  push:
+    branches:
+      - main        # main branch pe push hoga toh deploy hoga
+
+# ── Jobs ─────────────────────────────────────────────────────
+jobs:
+
+  # ── Job 1: Backend Deploy ─────────────────────────────────
+  deploy-backend:
+    name: Deploy Backend
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Code checkout
+        uses: actions/checkout@v4
+
+      - name: Backend EC2 pe deploy karo
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.BACKEND_EC2_IP }}
+          username: ec2-user
+          key: ${{ secrets.EC2_SSH_KEY }}
+          proxy_host: ${{ secrets.BASTION_IP }}
+          proxy_username: ec2-user
+          proxy_key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            echo "=== Backend deploy start: $(date) ==="
+
+            cd /home/ec2-user/app
+
+            # Latest code pull karo
+            git pull origin main
+
+            # Agar requirements badli ho toh install karo
+            pip3 install -r backend/requirements.txt --ignore-installed 2>&1 || true
+
+            # Service restart karo
+            sudo systemctl restart hirewalk-backend
+
+            # Health check karo
+            sleep 5
+            curl -sf http://localhost:5000/api/health && echo "Backend healthy!" || echo "Backend health check failed"
+
+            echo "=== Backend deploy complete: $(date) ==="
+
+  # ── Job 2: Frontend Deploy ────────────────────────────────
+  deploy-frontend:
+    name: Deploy Frontend
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Code checkout
+        uses: actions/checkout@v4
+
+      - name: Frontend EC2 pe deploy karo
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.FRONTEND_EC2_IP }}
+          username: ec2-user
+          key: ${{ secrets.EC2_SSH_KEY }}
+          proxy_host: ${{ secrets.BASTION_IP }}
+          proxy_username: ec2-user
+          proxy_key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            echo "=== Frontend deploy start: $(date) ==="
+
+            cd /var/www/hirewalk
+
+            # Latest code pull karo
+            sudo git pull origin main
+
+            # Nginx reload karo (restart nahi — zero downtime)
+            sudo nginx -t && sudo systemctl reload nginx
+
+            echo "=== Frontend deploy complete: $(date) ==="

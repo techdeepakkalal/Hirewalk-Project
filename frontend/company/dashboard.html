@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Company Dashboard — HireWalk</title>
+  <link rel="stylesheet" href="../css/style.css"/>
+  <style>
+    .interview-card-v2 {
+      background: var(--surface);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      transition: var(--transition);
+    }
+    .interview-card-v2:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+
+    .ic-top {
+      background: linear-gradient(135deg, var(--primary), var(--primary-mid));
+      padding: 20px 22px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .ic-top h3 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -.01em;
+      margin-bottom: 4px;
+    }
+
+    .ic-top p {
+      font-size: .775rem;
+      color: rgba(255,255,255,.55);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .ic-body { padding: 18px 22px; }
+
+    .ic-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .ic-stat {
+      background: var(--bg);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+      text-align: center;
+      border: 1px solid var(--border-light);
+    }
+
+    .ic-stat .val {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--primary);
+      letter-spacing: -.02em;
+      line-height: 1;
+    }
+
+    .ic-stat .lbl {
+      font-size: .68rem;
+      color: var(--muted);
+      margin-top: 4px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+
+    .ic-actions {
+      display: flex;
+      gap: 8px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border-light);
+      flex-wrap: wrap;
+    }
+
+    .progress-bar-wrap {
+      margin-bottom: 16px;
+    }
+
+    .progress-bar-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: .75rem;
+      color: var(--muted);
+      margin-bottom: 6px;
+      font-weight: 500;
+    }
+
+    .progress-bar {
+      height: 6px;
+      background: var(--bg);
+      border-radius: 99px;
+      overflow: hidden;
+      border: 1px solid var(--border-light);
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), #60a5fa);
+      border-radius: 99px;
+      transition: width .5s ease;
+    }
+
+    .section-title-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1.5px solid var(--border-light);
+    }
+
+    .section-title-bar h2 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--primary);
+      letter-spacing: -.01em;
+    }
+
+    .stat-card-v2 {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 22px 24px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      position: relative;
+      overflow: hidden;
+      transition: var(--transition);
+    }
+    .stat-card-v2:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+    .stat-card-v2 .stat-value {
+      font-size: 2.4rem;
+      font-weight: 800;
+      color: var(--primary);
+      line-height: 1;
+      letter-spacing: -.04em;
+    }
+    .stat-card-v2 .stat-label {
+      font-size: .72rem;
+      color: var(--muted);
+      margin-top: 8px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+    .stat-blue  { border-left: 4px solid var(--accent); }
+    .stat-green { border-left: 4px solid var(--success); }
+    .stat-amber { border-left: 4px solid var(--warning); }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <a class="nav-brand" href="../index.html">
+    <div class="nav-brand-icon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round">
+        <path d="M20 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
+        <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+      </svg>
+    </div>
+    Hire<span>Walk</span>
+  </a>
+  <div class="nav-links" id="nav-right"></div>
+</nav>
+
+<div class="page" id="main">
+  <div style="text-align:center;padding:80px 20px">
+    <span class="spinner spinner-dark" style="width:28px;height:28px"></span>
+    <p style="margin-top:12px;color:var(--muted);font-size:.875rem">Loading dashboard...</p>
+  </div>
+</div>
+
+<!-- Bookings Modal -->
+<div class="modal-overlay" id="bookings-modal">
+  <div class="modal" style="max-width:700px">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-title">Candidate Bookings</span>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div id="modal-body">
+      <div style="text-align:center;padding:32px">
+        <span class="spinner spinner-dark"></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="../js/api.js"></script>
+<script src="../js/auth.js"></script>
+<script>
+  const user = Auth.get();
+  Auth.requireAuth('company');
+
+  document.getElementById('nav-right').innerHTML = `
+    <span style="color:rgba(255,255,255,.65);font-size:.825rem;font-weight:500;display:flex;align-items:center;gap:6px">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      ${user?.name}
+    </span>
+    <button class="nav-btn ghost" onclick="location.href='post.html'">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Post Interview
+    </button>
+    <button class="nav-btn filled" onclick="Auth.logout()">Logout</button>
+  `;
+
+  async function load() {
+    const main = document.getElementById('main');
+    try {
+      const { interviews } = await Api.getCompanyInterviews();
+      const totalBookings  = interviews.reduce((a, i) => a + (i.total_bookings || 0), 0);
+      const active         = interviews.filter(i => i.status === 'active').length;
+
+      main.innerHTML = `
+        <div class="page-header">
+          <div>
+            <h1>Company Dashboard</h1>
+            <p>Welcome back, ${user?.name}</p>
+          </div>
+          <button class="btn btn-primary" onclick="location.href='post.html'">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Post Walk-in Interview
+          </button>
+        </div>
+
+        <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:36px">
+          <div class="stat-card-v2 stat-blue">
+            <div class="stat-value">${interviews.length}</div>
+            <div class="stat-label">Total Posted</div>
+          </div>
+          <div class="stat-card-v2 stat-green">
+            <div class="stat-value">${active}</div>
+            <div class="stat-label">Active Interviews</div>
+          </div>
+          <div class="stat-card-v2 stat-amber">
+            <div class="stat-value">${totalBookings}</div>
+            <div class="stat-label">Total Bookings</div>
+          </div>
+        </div>
+
+        <div class="section-title-bar">
+          <h2>Your Interviews</h2>
+          <span class="badge badge-blue">${interviews.length} total</span>
+        </div>
+
+        ${interviews.length === 0 ? `
+          <div class="empty-state">
+            <div class="empty-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+            </div>
+            <h3>No interviews posted yet</h3>
+            <p>Post your first walk-in interview to start receiving candidates</p>
+            <br>
+            <button class="btn btn-primary" onclick="location.href='post.html'">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Post Interview
+            </button>
+          </div>
+        ` : `
+          <div class="grid-2">
+            ${interviews.map(renderCard).join('')}
+          </div>
+        `}
+      `;
+    } catch (err) {
+      main.innerHTML = `<div class="alert alert-error">${err.message}</div>`;
+    }
+  }
+
+  function renderCard(i) {
+    const booked    = i.total_bookings || 0;
+    const total     = i.candidates_required || 1;
+    const pct       = Math.min(100, Math.round((booked / total) * 100));
+    const statusCls = i.status === 'active' ? 'badge-success' : 'badge-muted';
+
+    return `
+      <div class="interview-card-v2">
+        <div class="ic-top">
+          <div>
+            <h3>${i.role}</h3>
+            <p>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              ${i.interview_date}
+              &nbsp;·&nbsp;
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              ${i.package}
+            </p>
+          </div>
+          <span class="badge ${statusCls}" style="flex-shrink:0">${i.status}</span>
+        </div>
+
+        <div class="ic-body">
+          <div class="ic-stats">
+            <div class="ic-stat">
+              <div class="val">${booked}</div>
+              <div class="lbl">Booked</div>
+            </div>
+            <div class="ic-stat">
+              <div class="val">${total}</div>
+              <div class="lbl">Required</div>
+            </div>
+            <div class="ic-stat">
+              <div class="val">${i.slots?.length || 0}</div>
+              <div class="lbl">Slots</div>
+            </div>
+          </div>
+
+          <div class="progress-bar-wrap">
+            <div class="progress-bar-label">
+              <span>Booking Progress</span>
+              <span>${pct}%</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" style="width:${pct}%"></div>
+            </div>
+          </div>
+
+          <div class="ic-actions">
+            <button class="btn btn-primary btn-sm" onclick="viewBookings(${i.id}, '${i.role}')">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+              View Bookings
+            </button>
+            ${i.status === 'active' ? `
+              <button class="btn btn-danger btn-sm" onclick="closeInterview(${i.id}, this)">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                Close
+              </button>
+            ` : ''}
+          </div>
+        </div>
+      </div>`;
+  }
+
+  async function viewBookings(interviewId, role) {
+    document.getElementById('modal-title').textContent = `Bookings — ${role}`;
+    document.getElementById('modal-body').innerHTML = `
+      <div style="text-align:center;padding:32px">
+        <span class="spinner spinner-dark"></span>
+        <p style="margin-top:8px;color:var(--muted);font-size:.825rem">Loading candidates...</p>
+      </div>`;
+    document.getElementById('bookings-modal').classList.add('active');
+
+    try {
+      const { bookings } = await Api.interviewBookings(interviewId);
+      const body = document.getElementById('modal-body');
+
+      if (!bookings.length) {
+        body.innerHTML = `
+          <div class="empty-state" style="padding:40px 20px">
+            <div class="empty-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.5" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+            </div>
+            <h3>No bookings yet</h3>
+            <p>Candidates haven't booked slots for this interview yet</p>
+          </div>`;
+        return;
+      }
+
+      body.innerHTML = `
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Candidate</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Time Slot</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${bookings.map(b => `
+                <tr>
+                  <td><strong>${b.user_name}</strong></td>
+                  <td>${b.user_email}</td>
+                  <td>${b.user_phone || '—'}</td>
+                  <td>${b.slot_time}</td>
+                  <td><span class="badge ${b.status === 'confirmed' ? 'badge-success' : 'badge-muted'}">${b.status}</span></td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+        <p style="font-size:.775rem;color:var(--muted);padding:12px 0 0">${bookings.length} candidate${bookings.length !== 1 ? 's' : ''} booked</p>
+      `;
+    } catch (err) {
+      document.getElementById('modal-body').innerHTML =
+        `<div class="alert alert-error">${err.message}</div>`;
+    }
+  }
+
+  function closeModal() {
+    document.getElementById('bookings-modal').classList.remove('active');
+  }
+
+  async function closeInterview(id, btn) {
+    if (!confirm('Close this interview? No new bookings will be accepted.')) return;
+    setLoading(btn, true, 'Closing...');
+    try {
+      await Api.closeInterview(id);
+      load();
+    } catch (err) {
+      alert(err.message);
+      setLoading(btn, false);
+    }
+  }
+
+  // Close modal on overlay click
+  document.getElementById('bookings-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+
+  load();
+</script>
+</body>
+</html>

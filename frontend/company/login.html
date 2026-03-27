@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Company Login — HireWalk</title>
+  <link rel="stylesheet" href="../css/style.css"/>
+</head>
+<body>
+<div class="auth-page">
+  <div class="auth-left">
+    <div class="auth-left-grid"></div>
+    <div class="auth-left-content">
+      <a href="../index.html" class="auth-logo" style="margin-bottom:48px">
+        <div class="auth-logo-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M20 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></div>
+        HireWalk
+      </a>
+      <h2>Welcome back to your company dashboard.</h2>
+      <p style="margin-top:16px">Manage your walk-in drives, track bookings, and reach the right candidates.</p>
+    </div>
+  </div>
+  <div class="auth-right">
+    <div class="auth-form">
+      <a href="../index.html" class="auth-logo">
+        <div class="auth-logo-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M20 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></div>
+        HireWalk
+      </a>
+      <h2>Company Sign In</h2>
+      <p class="subtitle">Access your interview management portal</p>
+      <div id="alert-box"></div>
+      <div class="form-group">
+        <label>Email</label>
+        <input class="form-control" id="email" type="email" placeholder="hr@yourcompany.com"/>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input class="form-control" id="password" type="password" placeholder="Your password"/>
+      </div>
+      <button class="btn btn-primary" style="width:100%;margin-top:4px" id="login-btn" onclick="login()">Sign In</button>
+      <p style="text-align:center;margin-top:20px;font-size:.8rem;color:var(--muted)">
+        No account? <a href="register.html" style="color:var(--accent);font-weight:600">Register your company</a>
+      </p>
+    </div>
+  </div>
+</div>
+<script src="../js/api.js"></script>
+<script src="../js/auth.js"></script>
+<script>
+  Auth.redirectIfLoggedIn();
+  async function login() {
+    const btn   = document.getElementById('login-btn');
+    const box   = document.getElementById('alert-box');
+    const email    = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    if (!email || !password) return showAlert(box, 'Email and password are required');
+    setLoading(btn, true, 'Signing in...');
+    try {
+      const res = await Api.companyLogin({ email, password });
+      Auth.save(res.token, res.user);
+      location.href = 'dashboard.html';
+    } catch (err) {
+      showAlert(box, err.message);
+    } finally {
+      setLoading(btn, false);
+    }
+  }
+  document.addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
+</script>
+</body>
+</html>

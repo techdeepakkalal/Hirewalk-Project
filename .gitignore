@@ -1,0 +1,71 @@
+# ============================================================
+# .gitignore — HireWalk Project
+# ============================================================
+
+# ── Python ───────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg
+*.egg-info/
+dist/
+build/
+*.so
+.venv/
+venv/
+env/
+ENV/
+
+# ── Environment / Secrets ────────────────────────────────────
+.env
+.env.*
+*.env
+!.env.example
+
+# ── Terraform ────────────────────────────────────────────────
+**/.terraform/
+**/.terraform.lock.hcl
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+*.tfplan
+tfplan
+override.tf
+override.tf.json
+*_override.tf
+secrets.tfvars
+
+# ── SSH Keys ─────────────────────────────────────────────────
+*.pem
+*.key
+*.ppk
+
+# ── OS Files ─────────────────────────────────────────────────
+.DS_Store
+.DS_Store?
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# ── Editor ───────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ── Logs ─────────────────────────────────────────────────────
+*.log
+logs/
+app.log
+app.pid
+
+# ── Node (agar future mein use ho) ───────────────────────────
+node_modules/
+npm-debug.log*
+
+# ── Database dumps ───────────────────────────────────────────
+*.sql.gz
+*.dump
